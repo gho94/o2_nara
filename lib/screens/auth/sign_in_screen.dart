@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:o2_nara/core/constants/app_constants.dart';
 import 'package:o2_nara/core/theme/app_colors.dart';
-import 'package:o2_nara/screens/design/design_test_screen.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
