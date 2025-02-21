@@ -62,11 +62,11 @@ class AuthService {
     }
   }
 
-  Future<UserModel?> signInWithGoogle() async {
+  Future<UserModel?> signInWithSocial({
+    required String provider,
+  }) async {
     try {
-      final userCredential = await auth.signInWithCredential(
-        await _socialAuthService.signInWithGoogle(),
-      );
+      final userCredential = await getUserCredential(provider: provider);
 
       final user = userCredential.user;
       if (user == null) return null;
@@ -74,59 +74,54 @@ class AuthService {
       final existingUser = await userRepository.getUser(user.uid);
       if (existingUser != null) return existingUser;
 
-      final newUser = UserModel(
-        id: user.uid,
-        email: user.email ?? user.providerData.first.email!,
-        name: user.displayName,
-        createdAt: DateTime.now(),
-        updatedAt: null,
-      );
+      final newUser = await createUser(user: user);
       await userRepository.createUser(newUser);
+
       return newUser;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<UserModel?> signInWithFacebook() async {
+  Future<UserCredential> getUserCredential({
+    required String provider,
+  }) async {
     try {
-      final userCredential = await auth.signInWithCredential(
-        await _socialAuthService.signInWithFacebook(),
-      );
-
-      final user = userCredential.user;
-      if (user == null) return null;
-
-      final existingUser = await userRepository.getUser(user.uid);
-      if (existingUser != null) return existingUser;
-
-      final newUser = UserModel(
-        id: user.uid,
-        email: user.email ?? user.providerData.first.email!,
-        name: user.displayName,
-        createdAt: DateTime.now(),
-        updatedAt: null,
-      );
-
-      await userRepository.createUser(newUser);
-      return newUser;
+      final UserCredential userCredential;
+      switch (provider) {
+        case 'google':
+          userCredential = await auth.signInWithCredential(
+            await _socialAuthService.signInWithGoogle(),
+          );
+          break;
+        case 'facebook':
+          userCredential = await auth.signInWithCredential(
+            await _socialAuthService.signInWithFacebook(),
+          );
+          break;
+        case 'naver':
+          userCredential = await auth.signInWithCustomToken(
+            await _socialAuthService.signInWithNaver(),
+          );
+          break;
+        case 'kakao':
+          userCredential = await auth.signInWithCredential(
+            await _socialAuthService.signInWithKakao(),
+          );
+          break;
+        default:
+          throw Exception('Invalid provider');
+      }
+      return userCredential;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<UserModel?> signInWithNaver() async {
+  Future<UserModel> createUser({
+    required User user,
+  }) async {
     try {
-      final userCredential = await auth.signInWithCustomToken(
-        await _socialAuthService.signInWithNaver(),
-      );
-
-      final user = userCredential.user;
-      if (user == null) return null;
-
-      final existingUser = await userRepository.getUser(user.uid);
-      if (existingUser != null) return existingUser;
-
       final newUser = UserModel(
         id: user.uid,
         email: user.email ?? user.providerData.first.email!,
@@ -134,35 +129,6 @@ class AuthService {
         createdAt: DateTime.now(),
         updatedAt: null,
       );
-
-      await userRepository.createUser(newUser);
-      return newUser;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<UserModel?> signInWithKakao() async {
-    try {
-      final userCredential = await auth.signInWithCredential(
-        await _socialAuthService.signInWithKakao(),
-      );
-
-      final user = userCredential.user;
-      if (user == null) return null;
-
-      final existingUser = await userRepository.getUser(user.uid);
-      if (existingUser != null) return existingUser;
-
-      final newUser = UserModel(
-        id: user.uid,
-        email: user.email ?? user.providerData.first.email!,
-        name: user.displayName,
-        createdAt: DateTime.now(),
-        updatedAt: null,
-      );
-
-      await userRepository.createUser(newUser);
       return newUser;
     } catch (e) {
       rethrow;
@@ -173,6 +139,7 @@ class AuthService {
     try {
       await _socialAuthService.signOutWithGoogle();
       await _socialAuthService.signOutWithFacebook();
+      await _socialAuthService.signOutWithNaver();
       await _socialAuthService.signOutWithKakao();
 
       await auth.signOut();
