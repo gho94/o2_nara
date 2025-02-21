@@ -1,5 +1,7 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
@@ -7,6 +9,7 @@ class SocialAuthService {
   final _googleSignIn = GoogleSignIn(signInOption: SignInOption.standard);
   final _facebookAuth = FacebookAuth.instance;
   final _kakaoAuth = UserApi.instance;
+  final _functions = FirebaseFunctions.instance;
 
   SocialAuthService();
 
@@ -39,6 +42,26 @@ class SocialAuthService {
       );
 
       return credential;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> signInWithNaver() async {
+    try {
+      final result = await FlutterNaverLogin.logIn();
+      if (result.status == NaverLoginStatus.error) throw Exception('네이버 로그인 실패');
+
+      final httpsCallableResult = await _functions.httpsCallable('createCustomToken').call({
+        "id": result.account.id,
+        "email": result.account.email,
+        "name": result.account.name,
+      });
+
+      final customToken = httpsCallableResult.data["customToken"];
+      if (customToken == null) throw Exception('네이버 로그인 실패');
+
+      return customToken;
     } catch (e) {
       rethrow;
     }
