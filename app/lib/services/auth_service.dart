@@ -115,6 +115,33 @@ class AuthService {
     }
   }
 
+  Future<UserModel?> signInWithNaver() async {
+    try {
+      final userCredential = await auth.signInWithCustomToken(
+        await _socialAuthService.signInWithNaver(),
+      );
+
+      final user = userCredential.user;
+      if (user == null) return null;
+
+      final existingUser = await userRepository.getUser(user.uid);
+      if (existingUser != null) return existingUser;
+
+      final newUser = UserModel(
+        id: user.uid,
+        email: user.email ?? user.providerData.first.email!,
+        name: user.displayName,
+        createdAt: DateTime.now(),
+        updatedAt: null,
+      );
+
+      await userRepository.createUser(newUser);
+      return newUser;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<UserModel?> signInWithKakao() async {
     try {
       final userCredential = await auth.signInWithCredential(

@@ -1,19 +1,45 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+// 서비스 계정 인증 설정
+const serviceAccount = require('./o2nara-151fb-firebase-adminsdk.json');
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Firebase Functions v2 import 추가
+const { onDocumentCreated, onDocumentUpdated, onDocumentDeleted, onDocumentWritten } = require("firebase-functions/v2/firestore");
+
+exports.createCustomToken = functions.https.onCall(async ({data}, context) => {
+  try {
+    const uid = `naver:${data.id}`;
+    const email = data.email;
+    const name = data.name;
+
+    let userRecord;
+    try {
+      userRecord = await admin.auth().getUser(uid);      
+    } catch (error) {
+      userRecord = await admin.auth().createUser({
+        uid: uid,
+        email: email,
+        emailVerified: true,
+        displayName: name,
+        providerData: [{
+            providerId: 'naver.com',
+            uid: data.id,
+            displayName: name,
+            email: email
+        }]
+      });
+    }
+
+    const customToken = await admin.auth().createCustomToken(uid);
+    
+    return { customToken };
+  } catch (error) {
+    console.error('Error creating custom token:', error);
+    throw new functions.https.HttpsError('internal', 'Error creating custom token');
+  }
+});

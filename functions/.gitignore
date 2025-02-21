@@ -81,3 +81,6 @@ build/Release
 
 # dataconnect generated files
 .dataconnect
+
+# Firebase config
+o2nara-151fb-firebase-adminsdk.json

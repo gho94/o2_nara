@@ -44,6 +44,9 @@ android {
         resValue "string", "facebook_client_token", localProperties.getProperty('facebook.client.token', '')
         resValue "string", "kakao_native_app_key", localProperties.getProperty('kakao.native.app.key', '')
         resValue "string", "kakao_scheme", "kakao${localProperties.getProperty('kakao.native.app.key', '')}"    
+        resValue "string", "client_id", localProperties.getProperty('client_id', '')
+        resValue "string", "client_secret", localProperties.getProperty('client_secret', '')
+        resValue "string", "naver_scheme", "naver${localProperties.getProperty('client_id', '')}"
     }
 
     signingConfigs {

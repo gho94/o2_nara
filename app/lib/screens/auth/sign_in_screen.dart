@@ -64,9 +64,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         case 'facebook':
           await ref.read(authProvider.notifier).signInWithFacebook();
           break;
-        // case 'naver':
-        //   await ref.read(authProvider.notifier).signInWithNaver();
-        //   break;
+        case 'naver':
+          await ref.read(authProvider.notifier).signInWithNaver();
+          break;
         case 'kakao':
           await ref.read(authProvider.notifier).signInWithKakao();
           break;

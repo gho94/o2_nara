@@ -9,6 +9,9 @@
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+        <meta-data android:name="com.naver.sdk.clientId" android:value="@string/client_id"/>
+        <meta-data android:name="com.naver.sdk.clientSecret" android:value="@string/client_secret"/>
+        <meta-data android:name="com.naver.sdk.clientName" android:value="@string/client_name"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -36,7 +39,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-            
+        <activity
+            android:name="com.navercorp.nid.oauth.NidOAuthBridgeActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/naver_scheme" android:host="oauth"/>
+            </intent-filter>
+        </activity>    
         <!-- 카카오 로그인 커스텀 URL 스킴 설정 -->
         <activity 
             android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
