@@ -57,6 +57,39 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await authService.signInWithGoogle();
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithFacebook() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await authService.signInWithFacebook();
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> signInWithKakao() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await authService.signInWithKakao();
+      state = AsyncValue.data(user);
+    } catch (error, stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     state = const AsyncValue.loading();
     try {
