@@ -101,6 +101,15 @@ class SocialAuthService {
     }
   }
 
+  Future<void> signOutWithNaver() async {
+    try {
+      final isNaverLoggedIn = await FlutterNaverLogin.isLoggedIn;
+      if (isNaverLoggedIn) await FlutterNaverLogin.logOut();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> signOutWithKakao() async {
     try {
       final isKakaoLoggedIn = await AuthApi.instance.hasToken();

@@ -57,20 +57,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     setState(() => _isLoading = true);
 
     try {
-      switch (provider) {
-        case 'google':
-          await ref.read(authProvider.notifier).signInWithGoogle();
-          break;
-        case 'facebook':
-          await ref.read(authProvider.notifier).signInWithFacebook();
-          break;
-        case 'naver':
-          await ref.read(authProvider.notifier).signInWithNaver();
-          break;
-        case 'kakao':
-          await ref.read(authProvider.notifier).signInWithKakao();
-          break;
-      }
+      await ref.read(authProvider.notifier).signInWithSocial(provider: provider);
       if (mounted) context.push('/products');
     } catch (error) {
       if (!mounted) return;
