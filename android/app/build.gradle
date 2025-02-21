@@ -8,6 +8,14 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
 android {
     namespace = "com.example.o2_nara"
     compileSdk = flutter.compileSdkVersion
@@ -28,12 +36,23 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 33
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        resValue "string", "facebook_app_id", localProperties.getProperty('facebook.app.id', '')
+        resValue "string", "facebook_client_token", localProperties.getProperty('facebook.client.token', '')
+        resValue "string", "kakao_native_app_key", localProperties.getProperty('kakao.native.app.key', '')
+        resValue "string", "kakao_scheme", "kakao${localProperties.getProperty('kakao.native.app.key', '')}"    
     }
 
     signingConfigs {
+        debug {
+            storeFile file("o2_nara.jks")
+            storePassword "p@ssw0rd"
+            keyAlias "o2_nara"
+            keyPassword "p@ssw0rd"
+        }
         release {
             storeFile file("o2_nara.jks")
             storePassword "p@ssw0rd"
